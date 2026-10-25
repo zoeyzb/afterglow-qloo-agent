@@ -20,6 +20,8 @@ interface GraphNode { key: string; kind: Kind; label: string; color: string; pos
 interface GraphEdge { from: string; to: string; color: string; strength: number }
 
 const PATTERN_GOLD = '#e9c88f';
+// On touch screens, drag-to-rotate would trap vertical page scrolling; tapping stars still works.
+const coarsePointer = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
 
 function layout(atlas: Atlas) {
   const nodes: GraphNode[] = [];
@@ -121,7 +123,7 @@ function Graph({ atlas, selected, onSelect, reducedMotion }: Omit<Props, 'active
 
   return (
     <>
-      <OrbitControls enableZoom={false} enablePan={false} autoRotate={!reducedMotion && !focus} autoRotateSpeed={0.45} rotateSpeed={0.5} />
+      <OrbitControls enableZoom={false} enablePan={false} enableRotate={!coarsePointer} autoRotate={!reducedMotion && !focus} autoRotateSpeed={0.45} rotateSpeed={0.5} />
       <mesh ref={core} onClick={() => onSelect(null)}>
         <sphereGeometry args={[0.32, 32, 32]} />
         <meshBasicMaterial color="#f6dcaa" />

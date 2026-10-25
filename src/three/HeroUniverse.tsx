@@ -170,7 +170,7 @@ export default function HeroUniverse({ active, reducedMotion, showLabels }: Prop
       aria-hidden
     >
       <Starfield count={showLabels ? 1600 : 900} />
-      <group position={showLabels ? [3.7, 0.35, 0] : [0, 0.6, 0]} scale={showLabels ? 0.82 : 0.72}>
+      <group position={showLabels ? [3.7, 0.35, 0] : [0, 2.3, 0]} scale={showLabels ? 0.82 : 0.6}>
         <Rig reducedMotion={reducedMotion} showLabels={showLabels} />
       </group>
     </Canvas>

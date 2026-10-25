@@ -137,7 +137,7 @@ export default function Builder({ busy, status, example, onSubmit, onSample }: P
               </div>
               <div className="signal-input" style={{ ['--hue' as string]: active.hue }}>
                 <label htmlFor="signal-text" className="sr-only">A {active.noun} you love</label>
-                <input id="signal-text" ref={inputRef} value={text} onChange={e => setText(e.target.value)} placeholder={active.placeholder} maxLength={80} autoComplete="off" disabled={full} />
+                <input id="signal-text" ref={inputRef} value={text} onChange={e => setText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); add(); } }} placeholder={active.placeholder} maxLength={80} autoComplete="off" disabled={full} />
                 <button type="button" className="btn btn--soft" onClick={add} disabled={!text.trim() || full}>Add <span aria-hidden>↵</span></button>
               </div>
               <ul className="signal-list" aria-label="Your signals">

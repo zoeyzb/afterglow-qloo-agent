@@ -109,7 +109,8 @@ export default function Story() {
     mm.add('(min-width: 900px) and (prefers-reduced-motion: no-preference)', () => {
       const q = gsap.utils.selector(el);
       gsap.set(q('.st-links-a path, .st-links-b path'), { strokeDasharray: 1, strokeDashoffset: 1 });
-      gsap.set(q('.st-seeds .st-node, .st-patterns .st-node, .st-finds .st-node'), { opacity: 0, scale: 0.4 });
+      gsap.set(q('.st-patterns .st-node, .st-finds .st-node'), { opacity: 0, scale: 0.4 });
+      setActive(0);
       gsap.set(q('.st-halo'), { opacity: 0, scale: 0.5, transformOrigin: '320px 260px' });
       const tl = gsap.timeline({
         defaults: { ease: 'power2.out' },
@@ -119,11 +120,11 @@ export default function Story() {
           end: '+=220%',
           pin: q('.story__stage')[0],
           scrub: 0.8,
-          onUpdate: self => setActive(self.progress < 0.28 ? 0 : self.progress < 0.62 ? 1 : 2)
+          onUpdate: self => setActive(self.progress < 0.15 ? 0 : self.progress < 0.55 ? 1 : 2)
         }
       });
-      tl.to(q('.st-seeds .st-node'), { opacity: 1, scale: 1, stagger: 0.12, duration: 0.6 })
-        .to(q('.st-links-a path'), { strokeDashoffset: 0, stagger: 0.02, duration: 0.8 }, '+=0.25')
+      tl.to(q('.st-seeds .st-node'), { scale: 1.25, yoyo: true, repeat: 1, stagger: 0.08, duration: 0.25 })
+        .to(q('.st-links-a path'), { strokeDashoffset: 0, stagger: 0.02, duration: 0.8 }, '+=0.05')
         .to(q('.st-halo'), { opacity: 1, scale: 1, duration: 0.8 }, '<0.2')
         .to(q('.st-patterns .st-node'), { opacity: 1, scale: 1, stagger: 0.12, duration: 0.5 }, '<0.3')
         .to(q('.st-links-b path'), { strokeDashoffset: 0, stagger: 0.03, duration: 0.8 }, '+=0.35')
