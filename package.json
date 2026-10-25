@@ -1,14 +1,35 @@
 {
-  "name": "afterglow-qloo-agent",
+  "name": "tasteatlas-ai",
   "version": "1.0.0",
   "private": false,
-  "description": "An honest, Qloo-powered multi-step cultural discovery agent",
+  "description": "TasteAtlas AI — an interactive 3D map of your taste universe, powered by Qloo cultural intelligence",
   "scripts": {
+    "dev": "vite",
+    "serve": "node server.cjs",
+    "build": "vite build",
+    "typecheck": "tsc -p tsconfig.json",
     "start": "node server.cjs",
     "test": "node --test tests/*.test.cjs"
   },
   "engines": {
     "node": ">=20"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "framer-motion": "^14.6.0",
+    "gsap": "^3.15.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.186.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5"
+  }
 }
