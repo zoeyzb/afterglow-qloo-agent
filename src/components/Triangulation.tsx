@@ -34,8 +34,8 @@ export default function Triangulation() {
       <div className="container">
         <Reveal className="section-head">
           <Eyebrow index="02">Why combining loves works</Eyebrow>
-          <h2 className="section-title">One favorite finds similar.<br />A few show <em>connections.</em></h2>
-          <p className="section-lede">A film, a song and a book can share a mood. Toggle the examples to see how their overlap changes.</p>
+          <h2 className="section-title">One favorite finds similar picks.<br />A few reveal <em>connections.</em></h2>
+          <p className="section-lede">A film, an artist and a book can share a mood. Toggle the examples to see how their overlap changes.</p>
         </Reveal>
 
         <div className="why__grid">
