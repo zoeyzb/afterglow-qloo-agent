@@ -1,6 +1,14 @@
 # Afterglow — Cultural Taste Cartographer
 
-**Afterglow** is an original cultural discovery web app by **Sierra Byrd** built for the **Qloo Agentic Hackathon 2026**. It combines multiple cultural anchors (films, music, books) and uses Qloo's search and Insights APIs to generate grounded cross-category recommendations. Instead of hallucinating suggestions, it explicitly reports when Qloo access is missing, when entities cannot be found, or when the graph returns no matches.
+**Afterglow** is an original, cinematic, interactive cultural discovery web app by **Sierra Byrd** built for the **Qloo Agentic Hackathon 2026**. It combines multiple cultural anchors (films, music, books) and uses Qloo's search and Insights APIs to generate grounded cross-category recommendations. Instead of hallucinating suggestions, it explicitly reports when Qloo access is missing, when entities cannot be found, or when the graph returns no matches.
+
+## How to use the site
+
+- Open the **Interactive preview** to explore three hand-curated editorial examples, try changing films/music/books, inspect the cultural connection map, reveal the descriptive rationale for a card, and save discoveries to a browser-local collection. **Every preview card is illustrative and not Qloo-sourced.**
+- Switch to **Live Qloo API** to submit any original 2-4 film, artist or book anchors; the backend will resolve actual Qloo entities and request real recommendations. A missing/invalid API key returns a truthful error rather than filling the screen with made-up recommendations.
+- The interface supports pointer/keyboard graph node inspection, reduced-motion preferences, semantic labeling, mobile layouts and saved discovery lists stored in the browser only.
+
+Images in the editorial collage are downloaded from Unsplash (photo IDs: photo-1440404653325-ab127d49abc1, photo-1516280440614-37939bbacd81, photo-1519682337058-a94d519337bc). These are mood illustrations, **not images of the recommended works**.
 
 ## The agent workflow
 
@@ -43,7 +51,7 @@ Returns `source`, `resolved`, `unresolved`, and `picks` or an explicit JSON erro
 ## Competition checklist
 
 - [x] Original source code, public repo, and MIT license
-- [x] Responsive interface and real server-side Qloo integration code
+- [x] Responsive interactive editorial preview with saved list, cultural map and real server-side Qloo integration code
 - [x] Offline automated unit tests for orchestration and error paths
 - [ ] Event-issued key configured on live hosting
 - [ ] Verified live Qloo response and end-to-end judge testing
