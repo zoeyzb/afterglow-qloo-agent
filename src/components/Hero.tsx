@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { DOMAINS } from '../lib/domains';
+import type { LiveStatus } from '../lib/api';
 import { hasWebGL, SceneBoundary } from './ui';
 
 const HeroUniverse = lazy(() => import('../three/HeroUniverse'));
@@ -22,7 +23,7 @@ function useIsWide() {
   return wide;
 }
 
-export default function Hero() {
+export default function Hero({ status, onSample }: { status: LiveStatus; onSample: () => void }) {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { amount: 0.05 });
   const reduce = Boolean(useReducedMotion());
@@ -64,7 +65,9 @@ export default function Hero() {
           Add 2–5 favorites — films, artists, books or places. See what connects them, then discover what else fits your taste.
         </motion.p>
         <motion.div className="hero__ctas" {...fade(0.5)}>
-          <a className="btn btn--gold btn--lg" href="#chart">Chart my taste <span aria-hidden>→</span></a>
+          {status === 'offline'
+            ? <button type="button" className="btn btn--gold btn--lg" onClick={onSample}>Explore an example <span aria-hidden>→</span></button>
+            : <a className="btn btn--gold btn--lg" href="#chart">Chart my taste <span aria-hidden>→</span></a>}
           <a className="btn btn--ghost btn--lg" href="#how">See how it works</a>
         </motion.div>
         <motion.ul className="hero__facts" {...fade(0.65)}>

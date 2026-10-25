@@ -43,7 +43,12 @@ export default function App() {
   }, []);
 
   const retry = useCallback(() => { if (lastRequest.current) chart(lastRequest.current); }, [chart]);
-  const showSample = useCallback(() => setRun({ phase: 'ready', atlas: SAMPLE_ATLAS }), []);
+  const showSample = useCallback(() => {
+    inflight.current?.abort();
+    lastRequest.current = null;
+    setRun({ phase: 'ready', atlas: SAMPLE_ATLAS });
+    document.getElementById('atlas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
   const loadExample = useCallback((id: string) => {
     setExample({ id, nonce: Date.now() });
     document.getElementById('chart')?.scrollIntoView({ behavior: 'smooth' });
@@ -52,9 +57,9 @@ export default function App() {
   return (
     <>
       <a className="skip-link" href="#chart">Skip to the atlas builder</a>
-      <Nav status={status} savedCount={collection.items.length} onOpenCollection={() => setDrawerOpen(true)} />
+      <Nav status={status} savedCount={collection.items.length} onOpenCollection={() => setDrawerOpen(true)} onSample={showSample} />
       <main>
-        <Hero />
+        <Hero status={status} onSample={showSample} />
         <Story />
         <Triangulation />
         <Builder busy={run.phase === 'loading'} status={status} example={example} onSubmit={chart} onSample={showSample} />

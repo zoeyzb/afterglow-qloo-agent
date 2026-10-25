@@ -94,8 +94,8 @@ export default function Builder({ busy, status, example, onSubmit, onSample }: P
   const add = () => {
     const name = text.trim();
     if (!name) return;
-    if (full) { setError('Five signals is the limit. Remove one to add another.'); return; }
-    if (signals.some(s => s.name.toLowerCase() === name.toLowerCase() && s.domain === domain)) { setError('That one is already in your constellation.'); return; }
+    if (full) { setError('You can add up to five favorites. Remove one to add another.'); return; }
+    if (signals.some(s => s.name.toLowerCase() === name.toLowerCase() && s.domain === domain)) { setError('You already added that favorite.'); return; }
     setSignals(prev => [...prev, { id: newId(), domain, name: name.slice(0, 80) }]);
     setText('');
     setError(null);
@@ -109,8 +109,8 @@ export default function Builder({ busy, status, example, onSubmit, onSample }: P
   const submit = (e: FormEvent) => {
     e.preventDefault();
     if (text.trim()) { add(); return; }
-    if (signals.length < LIMITS.minSignals) { setError('Add at least two signals. The reading needs an overlap.'); return; }
-    if (!lenses.length) { setError('Choose at least one domain to chart discoveries in.'); return; }
+    if (signals.length < LIMITS.minSignals) { setError('Add at least two favorites to find their connections.'); return; }
+    if (!lenses.length) { setError('Choose at least one type of result you want to discover.'); return; }
     onSubmit({ signals: signals.map(({ domain: d, name }) => ({ domain: d, name })), lenses, orbit });
   };
   const active = DOMAIN_MAP[domain];
@@ -192,12 +192,12 @@ export default function Builder({ busy, status, example, onSubmit, onSample }: P
             {error && <p className="builder__error" role="alert">{error}</p>}
 
             <div className="builder__submit">
-              <button type="submit" className="btn btn--gold btn--lg btn--block" disabled={!canSubmit} aria-disabled={!canSubmit}>
-                {busy ? 'Finding connections…' : 'Find my matches'} <span aria-hidden>✦</span>
-              </button>
+              {status === 'offline'
+                ? <button type="button" className="btn btn--gold btn--lg btn--block" onClick={onSample}>Explore the sample map <span aria-hidden>✦</span></button>
+                : <button type="submit" className="btn btn--gold btn--lg btn--block" disabled={!canSubmit} aria-disabled={!canSubmit}>{busy ? 'Finding connections…' : 'Find my matches'} <span aria-hidden>✦</span></button>}
               <p className="builder__live">
                 {status === 'configured' && <>Live: your signals go to the Qloo API through our server. No account needed.</>}
-                {status === 'offline' && <>Qloo access isn't connected yet. <button type="button" className="link" onClick={onSample}>Try the clearly labelled sample</button> to explore the experience.</>}
+                {status === 'offline' && <>Demo mode uses preset favorites, not the ones you type above. Custom matches require an event-issued Qloo key.</>}
                 {(status === 'checking' || status === 'unknown') && <>Live picks require Qloo access. Samples are always labelled.</>}
               </p>
             </div>

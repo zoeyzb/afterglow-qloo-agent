@@ -5,7 +5,7 @@ import { LogoMark } from './ui';
 const STATUS_COPY: Record<LiveStatus, { label: string; title: string }> = {
   checking: { label: 'Checking engine', title: 'Checking whether live Qloo access is configured.' },
   configured: { label: 'Live engine ready', title: 'A Qloo key is configured on this server. Results come from the live Qloo API.' },
-  offline: { label: 'Live engine offline', title: 'No Qloo key is configured on this deployment. You will see an honest error instead of invented results.' },
+  offline: { label: 'Qloo access pending', title: 'No event-issued Qloo key is configured yet. The clearly labelled sample map is available.' },
   unknown: { label: 'Engine status unknown', title: 'The status endpoint could not be reached.' }
 };
 
@@ -19,7 +19,7 @@ export function LiveBadge({ status }: { status: LiveStatus }) {
   );
 }
 
-export default function Nav({ status, savedCount, onOpenCollection }: { status: LiveStatus; savedCount: number; onOpenCollection: () => void }) {
+export default function Nav({ status, savedCount, onOpenCollection, onSample }: { status: LiveStatus; savedCount: number; onOpenCollection: () => void; onSample: () => void }) {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -43,7 +43,9 @@ export default function Nav({ status, savedCount, onOpenCollection }: { status: 
         <button type="button" className="nav__collection" onClick={onOpenCollection} aria-label={'Open saved discoveries (' + savedCount + ')'}>
           <span aria-hidden>✦</span> {savedCount}
         </button>
-        <a className="btn btn--gold btn--sm" href="#chart">Chart my taste</a>
+        {status === 'offline'
+          ? <button type="button" className="btn btn--gold btn--sm" onClick={onSample}>Explore sample</button>
+          : <a className="btn btn--gold btn--sm" href="#chart">Chart my taste</a>}
       </div>
     </header>
   );
