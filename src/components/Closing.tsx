@@ -5,10 +5,10 @@ import type { Collection } from '../lib/collection';
 import { Eyebrow, LogoMark, Reveal } from './ui';
 
 const PRINCIPLES = [
-  { glyph: '⟡', title: 'Explainable by design', body: 'Every discovery shows which of your signals pulled it in, what patterns it shares, and how mainstream it is. No black box.' },
-  { glyph: '◎', title: 'Honest by default', body: "If the live engine is down or a title can't be found, we say so. We never pad results with invented picks. Samples are always labelled." },
-  { glyph: '⌘', title: 'Cross-domain', body: 'Ten cultural domains in, ten out. Your favorite film can lead to a restaurant, a city or a podcast.' },
-  { glyph: '◌', title: 'Private', body: 'No account and no profile. Signals are sent to Qloo only when you chart, and saved picks stay in your browser.' }
+  { glyph: '⟡', title: 'See why it fits', body: 'Explore the affinities behind each recommendation.' },
+  { glyph: '◎', title: 'No made-up results', body: 'Live picks come from Qloo. Samples are clearly marked.' },
+  { glyph: '⌘', title: 'Go beyond your category', body: 'From a favorite film to music, books or places.' },
+  { glyph: '◌', title: 'Your collection, your browser', body: 'No account. Your saved discoveries stay on this device.' }
 ];
 
 export function Principles() {
@@ -25,6 +25,7 @@ export function Principles() {
               <span className="principle__glyph" aria-hidden>{p.glyph}</span>
               <h3>{p.title}</h3>
               <p>{p.body}</p>
+              <span className="principle__connector" aria-hidden="true" />
             </Reveal>
           ))}
         </div>
@@ -49,7 +50,7 @@ export function FinalCTA({ onExample }: { onExample: (id: string) => void }) {
         <Reveal>
           <p className="eyebrow eyebrow--center"><span className="eyebrow__line" aria-hidden />Your move</p>
           <h2 className="finale__title">Everything you love<br />is connected. <em>Go see how.</em></h2>
-          <p className="section-lede">Three signals and about ten seconds. The result is a map of your taste you can explore, question and keep.</p>
+          <p className="section-lede">Choose a few favorites. Find their connections. Save what you discover.</p>
           <div className="finale__ctas">
             <a className="btn btn--gold btn--lg" href="#chart">Chart my taste universe <span aria-hidden>→</span></a>
           </div>
@@ -70,7 +71,7 @@ export function Footer() {
     <footer className="footer">
       <div className="container footer__inner">
         <a className="brand" href="#top"><LogoMark /><span>TasteAtlas<sup>AI</sup></span></a>
-        <p>An interactive 3D map of your taste universe. Recommendations come from the Qloo Insights API and describe aggregate cultural affinities, not claims about who you are.</p>
+        <p>A 3D map of what you love and what to discover next. Live recommendations use Qloo's cultural affinity data.</p>
         <nav aria-label="Footer">
           <a href="#how">How it works</a>
           <a href="#chart">Chart yours</a>

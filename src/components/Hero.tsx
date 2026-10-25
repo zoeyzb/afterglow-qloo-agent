@@ -6,9 +6,9 @@ import { hasWebGL, SceneBoundary } from './ui';
 const HeroUniverse = lazy(() => import('../three/HeroUniverse'));
 
 const READOUT = [
-  { label: 'Signals', items: ['Blade Runner 2049', 'Frank Ocean', 'Norwegian Wood'] },
-  { label: 'Shared patterns', items: ['Nocturnal', 'Melancholic', 'Lush minimalism'] },
-  { label: 'Discoveries', items: ['Tokyo · destination', 'Severance · TV', 'JBS listening bar · dining'] }
+  { label: 'Your favorites', items: ['Blade Runner 2049', 'Frank Ocean', 'Norwegian Wood'] },
+  { label: 'What connects them', items: ['Nocturnal', 'Melancholic', 'Lush minimalism'] },
+  { label: 'What you could discover', items: ['Tokyo · place', 'Severance · TV', 'JBS listening bar · dining'] }
 ];
 
 function useIsWide() {
@@ -61,8 +61,7 @@ export default function Hero() {
           Here's the map.
         </motion.h1>
         <motion.p className="hero__lede" {...fade(0.35)}>
-          Tell TasteAtlas AI 2–5 things you love: a film, an artist, a book, a restaurant, a city. It finds the patterns
-          they quietly share, then charts discoveries across every corner of culture, and shows why each one is there.
+          Add 2–5 favorites — films, artists, books or places. See what connects them, then discover what else fits your taste.
         </motion.p>
         <motion.div className="hero__ctas" {...fade(0.5)}>
           <a className="btn btn--gold btn--lg" href="#chart">Chart my taste <span aria-hidden>→</span></a>
@@ -70,7 +69,7 @@ export default function Hero() {
         </motion.div>
         <motion.ul className="hero__facts" {...fade(0.65)}>
           <li><strong>{DOMAINS.length}</strong> cultural domains</li>
-          <li><strong>2–5</strong> signals in</li>
+          <li><strong>2–5</strong> favorites to start</li>
           <li><strong>Every</strong> pick explained</li>
         </motion.ul>
       </div>

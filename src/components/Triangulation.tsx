@@ -10,13 +10,13 @@ const SIGNALS: { key: string; name: string; domain: DomainId; cx: number; cy: nu
 ];
 
 const READINGS: Record<string, { verdict: string; overlap: string; body: string }> = {
-  i: { verdict: 'Similarity', overlap: 'More space epics', body: 'One favorite only tells us what resembles it. Accurate, predictable, and stuck in one genre.' },
-  k: { verdict: 'Similarity', overlap: 'More psych-funk trios', body: 'Great if you want the same thing again. It never leaves the record shop.' },
-  p: { verdict: 'Similarity', overlap: 'More literary fantasy', body: 'Same shelf, same aisle. One signal can only point sideways.' },
-  ik: { verdict: 'Intersection', overlap: 'Expansive · warm · meditative', body: 'Two signals from different domains cancel out the genre and leave the sensibility behind.' },
-  ip: { verdict: 'Intersection', overlap: 'Vast spaces · solitude · quiet awe', body: 'Now we are describing how something feels, not what shelf it sits on.' },
-  kp: { verdict: 'Intersection', overlap: 'Hypnotic · dreamlike · gently strange', body: 'The overlap is narrower and far more personal than either signal alone.' },
-  ikp: { verdict: 'Signature', overlap: 'Solitary wonder · slow-burn awe · warm hypnotic calm', body: "Specific enough to find things you would never think to search for, in domains you didn't mention." }
+  i: { verdict: 'Similar picks', overlap: 'More space epics', body: 'One favorite often leads to more of the same.' },
+  k: { verdict: 'Similar picks', overlap: 'More psych-funk trios', body: 'One artist can point toward similar sounds.' },
+  p: { verdict: 'Similar picks', overlap: 'More literary fantasy', body: 'One book can lead to another like it.' },
+  ik: { verdict: 'Shared traits', overlap: 'Expansive · warm · meditative', body: 'Together, they reveal affinities beyond their genres.' },
+  ip: { verdict: 'Shared traits', overlap: 'Vast spaces · solitude · quiet awe', body: 'Different categories can still share a feeling.' },
+  kp: { verdict: 'Shared traits', overlap: 'Hypnotic · dreamlike · gently strange', body: 'Two favorites point to a more specific mood.' },
+  ikp: { verdict: 'Taste profile', overlap: 'Solitary wonder · slow-burn awe · warm hypnotic calm', body: 'Use these shared themes to explore other cultural categories.' }
 };
 
 export default function Triangulation() {
@@ -34,11 +34,8 @@ export default function Triangulation() {
       <div className="container">
         <Reveal className="section-head">
           <Eyebrow index="02">Why combining loves works</Eyebrow>
-          <h2 className="section-title">One favorite finds lookalikes.<br />Three find <em>you.</em></h2>
-          <p className="section-lede">
-            Recommendation engines usually take one thing you liked and stay in its lane. TasteAtlas reads your signals
-            <em> together</em>. What matters is the space where they overlap, and that space crosses domains.
-          </p>
+          <h2 className="section-title">One favorite finds similar.<br />A few show <em>connections.</em></h2>
+          <p className="section-lede">A film, a song and a book can share a mood. Toggle the examples to see how their overlap changes.</p>
         </Reveal>
 
         <div className="why__grid">
@@ -82,16 +79,16 @@ export default function Triangulation() {
                 <p>{reading.body}</p>
               </motion.div>
             </AnimatePresence>
-            <p className="fineprint">Illustrative reasoning. Toggle signals to see how the overlap changes.</p>
+            <p className="fineprint">Example only. Tap a favorite above to change the highlighted step.</p>
           </Reveal>
 
           <div className="why__cards">
             {[
-              { n: '1', t: 'Signal → similarity', d: 'Finds lookalikes inside one domain. Useful, but predictable.' },
-              { n: '2', t: 'Signals → intersection', d: 'Genre cancels out and the sensibility the two share is left behind.' },
-              { n: '3–5', t: 'Signals → signature', d: 'A taste fingerprint precise enough to travel across film, food, places and sound.' }
+              { n: '1', t: 'One favorite', d: 'Find things similar to what you already like.' },
+              { n: '2', t: 'Two favorites', d: 'Spot patterns that cross different categories.' },
+              { n: '3–5', t: 'A clearer taste map', d: 'Use shared themes to find something less obvious.' }
             ].map((c, i) => (
-              <Reveal key={c.n} delay={i * 0.08} className={'why__card glass' + (i === 2 ? ' why__card--hero' : '')}>
+              <Reveal key={c.n} delay={i * 0.08} className={'why__card glass' + (i === (count === 1 ? 0 : count === 2 ? 1 : 2) ? ' why__card--hero is-current' : '')}>
                 <span className="why__n">{c.n}</span>
                 <h3>{c.t}</h3>
                 <p>{c.d}</p>
@@ -99,9 +96,8 @@ export default function Triangulation() {
             ))}
             <Reveal delay={0.24} className="why__engine">
               <p>
-                <strong>Under the hood.</strong> Qloo's cultural graph links entities across film, TV, music, books,
-                podcasts, games, places, destinations and brands using anonymized, privacy-safe affinity data.
-                TasteAtlas sends your signals together, so every result comes from the space they share.
+                <strong>Behind the map.</strong> Qloo uses aggregate cultural affinities across films, music, books and places.
+                Results are recommendations, not claims about your personality.
               </p>
             </Reveal>
           </div>

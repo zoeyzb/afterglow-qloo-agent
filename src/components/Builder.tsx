@@ -18,11 +18,11 @@ let uid = 0;
 const newId = () => 'sig-' + ++uid;
 
 function hint(count: number) {
-  if (count === 0) return 'Start with anything you would defend at a dinner party.';
-  if (count === 1) return 'Add one more. The reading comes from the overlap between signals.';
-  if (count === 2) return 'Good. A third signal from a different domain sharpens the pattern.';
-  if (count < LIMITS.maxSignals) return 'Strong signature. Add another, or chart it now.';
-  return 'Full constellation. Five signals is the maximum.';
+  if (count === 0) return 'Pick a category, enter a title or name, and tap Add.';
+  if (count === 1) return 'Add one more favorite to find connections.';
+  if (count === 2) return 'Ready to explore. Add more favorites for a broader mix.';
+  if (count < LIMITS.maxSignals) return 'Ready to explore, or add one more favorite.';
+  return 'Five favorites added. You’re ready to explore.';
 }
 
 function Constellation({ signals, lenses }: { signals: SignalDraft[]; lenses: DomainId[] }) {
@@ -32,7 +32,7 @@ function Constellation({ signals, lenses }: { signals: SignalDraft[]; lenses: Do
   });
   const ready = signals.length >= LIMITS.minSignals;
   return (
-    <svg viewBox="0 0 360 360" className="constellation" role="img" aria-label={'Your constellation: ' + signals.length + ' signals, ' + lenses.length + ' discovery domains'}>
+    <svg viewBox="0 0 360 360" className="constellation" role="img" aria-label={'Preview: ' + signals.length + ' chosen favorites, ' + lenses.length + ' types of discoveries'}>
       <circle cx="180" cy="180" r="92" className="constellation__ring" />
       <circle cx="180" cy="180" r="150" className="constellation__ring constellation__ring--outer" />
       {pts.flatMap((a, i) => pts.slice(i + 1).map(b => (
@@ -120,14 +120,14 @@ export default function Builder({ busy, status, example, onSubmit, onSample }: P
       <div className="container">
         <Reveal className="section-head section-head--center">
           <Eyebrow index="03">Chart yours</Eyebrow>
-          <h2 className="section-title">Name what you love.<br />We'll map the <em>rest.</em></h2>
-          <p className="section-lede">Mix domains freely: a film, an album, a restaurant, a city. Different signals that share a feeling make the best readings.</p>
+          <h2 className="section-title">Start with what you love.<br />Find <em>what’s next.</em></h2>
+          <p className="section-lede">Add 2–5 favorites. Choose what you want to discover. Explore your matches.</p>
         </Reveal>
 
         <Reveal className="builder__shell glass">
           <form className="builder__form" onSubmit={submit} noValidate>
             <fieldset className="builder__step">
-              <legend><span className="step-n">1</span> What do you love? <span className="builder__count">{signals.length} / {LIMITS.maxSignals}</span></legend>
+              <legend><span className="step-n">1</span> Add your favorites <span className="builder__count">{signals.length} / {LIMITS.maxSignals} added</span></legend>
               <div className="domain-picker" role="radiogroup" aria-label="Domain of your next signal">
                 {DOMAINS.map(d => (
                   <button key={d.id} type="button" role="radio" aria-checked={domain === d.id} className={'chip chip--domain' + (domain === d.id ? ' is-on' : '')} style={{ ['--hue' as string]: d.hue }} onClick={() => { setDomain(d.id); inputRef.current?.focus(); }}>
@@ -163,7 +163,7 @@ export default function Builder({ busy, status, example, onSubmit, onSample }: P
             </fieldset>
 
             <fieldset className="builder__step">
-              <legend><span className="step-n">2</span> Where should we look? <span className="builder__count">{lenses.length} / {LIMITS.maxLenses}</span></legend>
+              <legend><span className="step-n">2</span> What do you want to find? <span className="builder__count">{lenses.length} / {LIMITS.maxLenses} selected</span></legend>
               <div className="lens-picker" role="group" aria-label="Discovery domains">
                 {DOMAINS.map(d => (
                   <button key={d.id} type="button" aria-pressed={lenses.includes(d.id)} className={'chip chip--lens' + (lenses.includes(d.id) ? ' is-on' : '')} style={{ ['--hue' as string]: d.hue }} onClick={() => toggleLens(d.id)} disabled={!lenses.includes(d.id) && lenses.length >= LIMITS.maxLenses}>
@@ -171,15 +171,15 @@ export default function Builder({ busy, status, example, onSubmit, onSample }: P
                   </button>
                 ))}
               </div>
-              <p className="builder__hint">{chosenLenses ? 'Cross-domain picks are where the surprises live.' : "We've pre-selected domains you didn't mention, since that's where the surprises live. Change them freely."}</p>
+              <p className="builder__hint">{chosenLenses ? 'Choose up to four types of recommendations. Music results are artists, not playable tracks.' : 'We picked three types to start. Choose up to four — these are results to find, not more favorites. Music means artists.'}</p>
             </fieldset>
 
             <fieldset className="builder__step">
-              <legend><span className="step-n">3</span> How far should we travel?</legend>
+              <legend><span className="step-n">3</span> Familiar or surprising?</legend>
               <div className="orbit-toggle" role="radiogroup" aria-label="Discovery distance">
                 {([
-                  ['near', 'Close orbit', "Qloo's strongest matches for your combined taste."],
-                  ['far', 'Deep space', 'Skips the obvious top matches and favors lesser-known picks.']
+                  ['near', 'Closest matches', 'Start with the most relevant results.'],
+                  ['far', 'Surprise me', 'Skip obvious picks and explore less mainstream results.']
                 ] as const).map(([value, title, desc]) => (
                   <button key={value} type="button" role="radio" aria-checked={orbit === value} className={'orbit-option' + (orbit === value ? ' is-on' : '')} onClick={() => setOrbit(value)}>
                     <span className={'orbit-icon orbit-icon--' + value} aria-hidden><i /></span>
@@ -193,28 +193,29 @@ export default function Builder({ busy, status, example, onSubmit, onSample }: P
 
             <div className="builder__submit">
               <button type="submit" className="btn btn--gold btn--lg btn--block" disabled={!canSubmit} aria-disabled={!canSubmit}>
-                {busy ? 'Charting your atlas…' : 'Chart my atlas'} <span aria-hidden>✦</span>
+                {busy ? 'Finding connections…' : 'Find my matches'} <span aria-hidden>✦</span>
               </button>
               <p className="builder__live">
                 {status === 'configured' && <>Live: your signals go to the Qloo API through our server. No account needed.</>}
-                {status === 'offline' && <>The live engine isn't connected on this deployment, so charting will return an honest error. You can still <button type="button" className="link" onClick={onSample}>explore a labelled sample atlas</button>.</>}
-                {(status === 'checking' || status === 'unknown') && <>Results come only from the live Qloo API. We never fill gaps with invented picks.</>}
+                {status === 'offline' && <>Qloo access isn't connected yet. <button type="button" className="link" onClick={onSample}>Try the clearly labelled sample</button> to explore the experience.</>}
+                {(status === 'checking' || status === 'unknown') && <>Live picks require Qloo access. Samples are always labelled.</>}
               </p>
             </div>
           </form>
 
           <aside className="builder__preview" aria-label="Live preview of your constellation">
             <div className="builder__preview-head">
-              <span>Live constellation</span>
+              <span>Your favorites · live preview</span>
               <span className={'tag ' + (signals.length >= LIMITS.minSignals ? 'tag--gold' : 'tag--muted')}>
-                {signals.length >= LIMITS.minSignals ? 'Ready to triangulate' : `${LIMITS.minSignals - signals.length} more to begin`}
+                {signals.length >= LIMITS.minSignals ? 'Ready to explore' : `${LIMITS.minSignals - signals.length} more to start`}
               </span>
             </div>
             <Constellation signals={signals} lenses={lenses} />
+            <p className="builder__visual-hint">Solid dots: things you love · Outlined dots: what to discover</p>
             <dl className="builder__summary">
-              <div><dt>Signals</dt><dd>{signals.length ? [...new Set(signals.map(s => DOMAIN_MAP[s.domain].label))].join(' · ') : '—'}</dd></div>
-              <div><dt>Charting</dt><dd>{lenses.map(l => DOMAIN_MAP[l].label).join(' · ') || '—'}</dd></div>
-              <div><dt>Distance</dt><dd>{orbit === 'near' ? 'Close orbit' : 'Deep space'}</dd></div>
+              <div><dt>Favorites</dt><dd>{signals.length ? [...new Set(signals.map(s => DOMAIN_MAP[s.domain].label))].join(' · ') : '—'}</dd></div>
+              <div><dt>Looking for</dt><dd>{lenses.map(l => DOMAIN_MAP[l].label).join(' · ') || '—'}</dd></div>
+              <div><dt>Style</dt><dd>{orbit === 'near' ? 'Closest matches' : 'Surprise me'}</dd></div>
             </dl>
           </aside>
         </Reveal>

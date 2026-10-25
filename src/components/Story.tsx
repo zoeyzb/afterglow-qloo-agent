@@ -9,18 +9,18 @@ gsap.registerPlugin(ScrollTrigger);
 const STEPS = [
   {
     kicker: 'Signals',
-    title: 'You name what you love.',
-    body: 'No quiz, no mood sliders. Just 2–5 real things from any domain. The more different they are, the sharper the reading.'
+    title: 'Pick your favorites.',
+    body: 'Add 2–5 things you love: a film, an artist, a book or a place.'
   },
   {
     kicker: 'Patterns',
-    title: 'We find what they share.',
-    body: "Each signal is resolved in Qloo's cultural graph, then read together. The traits at their intersection, not any single favorite, form your taste signature."
+    title: 'Find the connections.',
+    body: 'Qloo looks for cultural affinities across your choices.'
   },
   {
     kicker: 'Discoveries',
-    title: 'We chart where else it lives.',
-    body: 'Your combined signals surface aligned picks in the domains you choose. Every pick shows which of your loves pulled it in, and which patterns it shares.'
+    title: 'Discover something new.',
+    body: 'Explore related films, music, places and more — with an explanation for each pick.'
   }
 ];
 
@@ -140,8 +140,8 @@ export default function Story() {
       <div className="story__stage">
         <div className="story__copy">
           <Eyebrow index="01">How it works</Eyebrow>
-          <h2 className="section-title">From a few loves<br />to a whole <em>atlas.</em></h2>
-          <ol className="story__steps">
+          <h2 className="section-title">What you love leads<br />to <em>what’s next.</em></h2>
+          <ol className="story__steps" data-active={active}>
             {STEPS.map((s, i) => (
               <li key={s.kicker} className={'story__step' + (active === -1 || active === i ? ' is-active' : '') + (active > i ? ' is-done' : '')}>
                 <span className="story__num">0{i + 1}</span>
@@ -157,8 +157,11 @@ export default function Story() {
         <div className="story__visual glass">
           <span className="tag tag--muted story__tag">Illustrative reading</span>
           <Diagram />
+          <p className="story__phase" aria-live="off"><span className="story__phase-light" aria-hidden />
+            {active === 0 ? '01 · Start with your favorites' : active === 1 ? '02 · Find their shared connections' : active === 2 ? '03 · See what else matches' : 'Favorites → connections → discoveries'}
+          </p>
           <div className="story__legend" aria-hidden>
-            <span>Your signals</span><span>Shared patterns</span><span>Discoveries</span>
+            <span>Your favorites</span><span>Shared traits</span><span>New discoveries</span>
           </div>
         </div>
       </div>
