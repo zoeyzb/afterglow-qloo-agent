@@ -56,7 +56,9 @@ const ERROR_COPY: Record<AtlasErrorCode, { title: string; lead: string }> = {
   unresolved: { title: "We couldn't find those in the cultural graph.", lead: 'Try exact titles and names, e.g. “Spirited Away” rather than “that Ghibli bathhouse film”, and check that each signal sits in the right domain.' },
   invalid: { title: "That request didn't quite add up.", lead: 'Check that you have 2–5 signals and 1–4 discovery domains.' },
   upstream: { title: 'Qloo returned an error.', lead: "The cultural graph didn't answer cleanly, so we're showing nothing rather than something made up." },
-  network: { title: 'We could not reach the server.', lead: 'Check your connection and try again.' }
+  network: { title: 'We could not reach the server.', lead: 'Check your connection and try again.' },
+  rate_limit: { title: 'Qloo is handling too many requests.', lead: 'Wait a moment before retrying. Your favorites are still here, so you can safely try again.' },
+  timeout: { title: 'The Qloo request timed out.', lead: 'The cultural graph took too long to respond. Try again; we have not replaced the missing results with sample data.' }
 };
 
 function ErrorState({ code, message, onRetry, onSample }: { code: AtlasErrorCode; message: string; onRetry: () => void; onSample: () => void }) {
@@ -204,10 +206,10 @@ function Ready({ atlas, collection }: { atlas: Atlas; collection: Collection }) 
         <TasteDNA atlas={atlas} />
       </div>
 
-      <div className="filters" role="tablist" aria-label="Filter discoveries by domain">
-        <button role="tab" aria-selected={filter === 'all'} className={'chip' + (filter === 'all' ? ' is-on' : '')} onClick={() => setFilter('all')}>All <small>{total}</small></button>
+      <div className="filters" role="group" aria-label="Filter discoveries by domain">
+        <button aria-pressed={filter === 'all'} className={'chip' + (filter === 'all' ? ' is-on' : '')} onClick={() => setFilter('all')}>All <small>{total}</small></button>
         {lenses.map(l => (
-          <button key={l.domain} role="tab" aria-selected={filter === l.domain} className={'chip' + (filter === l.domain ? ' is-on' : '')} style={{ ['--hue' as string]: DOMAIN_MAP[l.domain].hue }} onClick={() => setFilter(l.domain)}>
+          <button key={l.domain} aria-pressed={filter === l.domain} className={'chip' + (filter === l.domain ? ' is-on' : '')} style={{ ['--hue' as string]: DOMAIN_MAP[l.domain].hue }} onClick={() => setFilter(l.domain)}>
             <span className="chip__dot" aria-hidden />{DOMAIN_MAP[l.domain].label} <small>{l.items.length}</small>
           </button>
         ))}
@@ -244,9 +246,10 @@ function Ready({ atlas, collection }: { atlas: Atlas; collection: Collection }) 
 
 export default function Results({ run, collection, onRetry, onSample }: Props) {
   const ref = useRef<HTMLElement>(null);
+  const reduceMotion = Boolean(useReducedMotion());
   useEffect(() => {
-    if (run.phase !== 'idle') ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [run.phase]);
+    if (run.phase !== 'idle') ref.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  }, [run.phase, reduceMotion]);
   if (run.phase === 'idle') return null;
   return (
     <section className="results section" id="atlas" ref={ref} aria-busy={run.phase === 'loading'}>

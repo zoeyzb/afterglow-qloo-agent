@@ -29,7 +29,12 @@ export default function Hero({ status, onSample }: { status: LiveStatus; onSampl
   const reduce = Boolean(useReducedMotion());
   const wide = useIsWide();
   const [webgl] = useState(hasWebGL);
+  const [sceneReady, setSceneReady] = useState(false);
   const [step, setStep] = useState(0);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setSceneReady(true), reduce ? 0 : 180);
+    return () => window.clearTimeout(timer);
+  }, [reduce]);
   useEffect(() => {
     if (reduce) return;
     const t = setInterval(() => setStep(s => (s + 1) % 3), 2600);
@@ -43,7 +48,7 @@ export default function Hero({ status, onSample }: { status: LiveStatus; onSampl
     <section className="hero" id="top" ref={ref}>
       <div className="hero__scene" aria-hidden>
         <div className="hero__nebula" />
-        {webgl && (
+        {webgl && sceneReady && (
           <SceneBoundary fallback={null}>
             <Suspense fallback={null}>
               <HeroUniverse active={inView} reducedMotion={reduce} showLabels={wide} />

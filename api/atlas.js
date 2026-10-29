@@ -20,7 +20,8 @@ async function handler(req, res) {
     return send(res, 200, await buildAtlas(body, key));
   } catch (error) {
     const status = error && Number.isInteger(error.status) ? error.status : 502;
-    return send(res, status, { error: (error && error.message) || 'The Qloo request failed.', code: status === 422 ? 'unresolved' : 'upstream' });
+    const code = status === 422 ? 'unresolved' : status === 429 ? 'rate_limit' : status === 504 ? 'timeout' : 'upstream';
+    return send(res, status, { error: (error && error.message) || 'The Qloo request failed.', code });
   }
 }
 

@@ -195,15 +195,21 @@ async function buildAtlas(body, apiKey) {
     patternsNote = 'Taste patterns unavailable: ' + (error.message || 'request failed.');
   }
 
+  const lensFailures = [];
   const lenses = await Promise.all(body.lenses.map(async lens => {
     try {
       return { domain: lens, items: await chartLens(lens, ids, seenIds, body.orbit, patterns, apiKey), error: null };
     } catch (error) {
       if (error && error.status === 429) throw error;
+      lensFailures.push(error);
       return { domain: lens, items: [], error: error.message || 'This domain could not be charted.' };
     }
   }));
-  if (lenses.every(l => l.error)) throw new QlooError(lenses[0].error);
+  if (lenses.every(l => l.error)) {
+    const retryableFailure = lensFailures.find(error => error && (error.status === 429 || error.status === 504));
+    if (retryableFailure) throw retryableFailure;
+    throw new QlooError(lenses[0].error);
+  }
 
   return { source: 'qloo', generatedAt: new Date().toISOString(), orbit: body.orbit, resolved, unresolved, patterns, patternsNote, lenses };
 }

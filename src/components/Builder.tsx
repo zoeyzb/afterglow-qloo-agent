@@ -4,6 +4,7 @@ import { DOMAINS, DOMAIN_MAP, EXAMPLE_SETS, LIMITS, type DomainId, type SignalDr
 import type { AtlasRequest, Orbit } from '../lib/types';
 import type { LiveStatus } from '../lib/api';
 import { Eyebrow, Reveal } from './ui';
+import { prepareAtlasSubmission, prepareSignalAddition } from '../lib/builder-submit.cjs';
 
 interface Props {
   busy: boolean;
@@ -91,12 +92,13 @@ export default function Builder({ busy, status, example, onSubmit, onSample }: P
   }, [example]);
 
   const full = signals.length >= LIMITS.maxSignals;
+  const pendingPreview = prepareSignalAddition(signals, text, domain, LIMITS.maxSignals);
   const add = () => {
-    const name = text.trim();
-    if (!name) return;
-    if (full) { setError('You can add up to five favorites. Remove one to add another.'); return; }
-    if (signals.some(s => s.name.toLowerCase() === name.toLowerCase() && s.domain === domain)) { setError('You already added that favorite.'); return; }
-    setSignals(prev => [...prev, { id: newId(), domain, name: name.slice(0, 80) }]);
+    const addition = prepareSignalAddition(signals, text, domain, LIMITS.maxSignals, newId);
+    if (addition.status === 'empty') return;
+    if (addition.status === 'full') { setError('You can add up to five favorites. Remove one to add another.'); return; }
+    if (addition.status === 'duplicate') { setError('You already added that favorite.'); return; }
+    setSignals(addition.signals);
     setText('');
     setError(null);
     inputRef.current?.focus();
@@ -105,13 +107,26 @@ export default function Builder({ busy, status, example, onSubmit, onSample }: P
     const next = lenses.includes(id) ? lenses.filter(l => l !== id) : lenses.length >= LIMITS.maxLenses ? lenses : [...lenses, id];
     setChosenLenses(next);
   };
-  const canSubmit = signals.length >= LIMITS.minSignals && lenses.length > 0 && !busy;
+  const readyCount = pendingPreview.status === 'ready' ? pendingPreview.signals.length : signals.length;
+  const canSubmit = readyCount >= LIMITS.minSignals && lenses.length > 0 && !busy;
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    if (text.trim()) { add(); return; }
-    if (signals.length < LIMITS.minSignals) { setError('Add at least two favorites to find their connections.'); return; }
-    if (!lenses.length) { setError('Choose at least one type of result you want to discover.'); return; }
-    onSubmit({ signals: signals.map(({ domain: d, name }) => ({ domain: d, name })), lenses, orbit });
+    const submission = prepareAtlasSubmission({
+      signals, text, domain, lenses, orbit,
+      minSignals: LIMITS.minSignals,
+      maxSignals: LIMITS.maxSignals,
+      createId: newId
+    });
+    if (submission.added) {
+      setSignals(submission.signals);
+      setText('');
+    }
+    if (submission.status === 'full') { setError('You can add up to five favorites. Remove one to add another.'); return; }
+    if (submission.status === 'duplicate') { setError('You already added that favorite.'); return; }
+    if (submission.status === 'minimum') { setError('Add at least two favorites to find their connections.'); return; }
+    if (submission.status === 'no_lenses') { setError('Choose at least one type of result you want to discover.'); return; }
+    setError(null);
+    onSubmit(submission.request!);
   };
   const active = DOMAIN_MAP[domain];
 
@@ -130,7 +145,16 @@ export default function Builder({ busy, status, example, onSubmit, onSample }: P
               <legend><span className="step-n">1</span> Add your favorites <span className="builder__count">{signals.length} / {LIMITS.maxSignals} added</span></legend>
               <div className="domain-picker" role="radiogroup" aria-label="Domain of your next signal">
                 {DOMAINS.map(d => (
-                  <button key={d.id} type="button" role="radio" aria-checked={domain === d.id} className={'chip chip--domain' + (domain === d.id ? ' is-on' : '')} style={{ ['--hue' as string]: d.hue }} onClick={() => { setDomain(d.id); inputRef.current?.focus(); }}>
+                  <button key={d.id} id={'domain-' + d.id} type="button" role="radio" tabIndex={domain === d.id ? 0 : -1} aria-checked={domain === d.id} className={'chip chip--domain' + (domain === d.id ? ' is-on' : '')} style={{ ['--hue' as string]: d.hue }} onClick={() => { setDomain(d.id); inputRef.current?.focus(); }} onKeyDown={e => {
+                    const forward = e.key === 'ArrowRight' || e.key === 'ArrowDown';
+                    const backward = e.key === 'ArrowLeft' || e.key === 'ArrowUp';
+                    if (!forward && !backward) return;
+                    e.preventDefault();
+                    const index = DOMAINS.findIndex(item => item.id === d.id);
+                    const next = DOMAINS[(index + (forward ? 1 : -1) + DOMAINS.length) % DOMAINS.length];
+                    setDomain(next.id);
+                    document.getElementById('domain-' + next.id)?.focus();
+                  }}>
                     <span aria-hidden className="chip__glyph">{d.glyph}</span>{d.label}
                   </button>
                 ))}
@@ -181,7 +205,13 @@ export default function Builder({ busy, status, example, onSubmit, onSample }: P
                   ['near', 'Closest matches', 'Start with the most relevant results.'],
                   ['far', 'Surprise me', 'Skip obvious picks and explore less mainstream results.']
                 ] as const).map(([value, title, desc]) => (
-                  <button key={value} type="button" role="radio" aria-checked={orbit === value} className={'orbit-option' + (orbit === value ? ' is-on' : '')} onClick={() => setOrbit(value)}>
+                  <button key={value} id={'orbit-' + value} type="button" role="radio" tabIndex={orbit === value ? 0 : -1} aria-checked={orbit === value} className={'orbit-option' + (orbit === value ? ' is-on' : '')} onClick={() => setOrbit(value)} onKeyDown={e => {
+                    if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(e.key)) return;
+                    e.preventDefault();
+                    const next = value === 'near' ? 'far' : 'near';
+                    setOrbit(next);
+                    document.getElementById('orbit-' + next)?.focus();
+                  }}>
                     <span className={'orbit-icon orbit-icon--' + value} aria-hidden><i /></span>
                     <span><strong>{title}</strong><small>{desc}</small></span>
                   </button>

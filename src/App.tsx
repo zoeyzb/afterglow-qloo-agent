@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import Nav from './components/Nav';
 import Hero from './components/Hero';
-import Story from './components/Story';
 import Triangulation from './components/Triangulation';
 import Builder from './components/Builder';
 import Results, { type RunState } from './components/Results';
@@ -11,11 +10,51 @@ import { useCollection } from './lib/collection';
 import { SAMPLE_ATLAS } from './lib/sample';
 import type { AtlasRequest } from './lib/types';
 
+const Story = lazy(() => import('./components/Story'));
+
+function scrollToSection(id: string) {
+  document.getElementById(id)?.scrollIntoView({
+    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    block: 'start'
+  });
+}
+
+function DeferredStory() {
+  const host = useRef<HTMLDivElement>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const element = host.current;
+    if (!element || loaded) return;
+    if (typeof IntersectionObserver === 'undefined') { setLoaded(true); return; }
+    const observer = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) {
+        setLoaded(true);
+        observer.disconnect();
+      }
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [loaded]);
+
+  return (
+    <div className="story-deferred" id="how" ref={host}>
+      {loaded ? (
+        <Suspense fallback={<div className="story-placeholder" aria-hidden="true" />}>
+          <Story />
+        </Suspense>
+      ) : <div className="story-placeholder" aria-hidden="true" />}
+    </div>
+  );
+}
+
 export default function App() {
   const [status, setStatus] = useState<LiveStatus>('checking');
   const [run, setRun] = useState<RunState>({ phase: 'idle' });
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [example, setExample] = useState<{ id: string; nonce: number } | null>(null);
+  const openCollection = useCallback(() => setDrawerOpen(true), []);
+  const closeCollection = useCallback(() => setDrawerOpen(false), []);
   const collection = useCollection();
   const lastRequest = useRef<AtlasRequest | null>(null);
   const inflight = useRef<AbortController | null>(null);
@@ -47,20 +86,20 @@ export default function App() {
     inflight.current?.abort();
     lastRequest.current = null;
     setRun({ phase: 'ready', atlas: SAMPLE_ATLAS });
-    document.getElementById('atlas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    scrollToSection('atlas');
   }, []);
   const loadExample = useCallback((id: string) => {
     setExample({ id, nonce: Date.now() });
-    document.getElementById('chart')?.scrollIntoView({ behavior: 'smooth' });
+    scrollToSection('chart');
   }, []);
 
   return (
     <>
       <a className="skip-link" href="#chart">Skip to the atlas builder</a>
-      <Nav status={status} savedCount={collection.items.length} onOpenCollection={() => setDrawerOpen(true)} onSample={showSample} />
+      <Nav status={status} savedCount={collection.items.length} onOpenCollection={openCollection} onSample={showSample} />
       <main>
         <Hero status={status} onSample={showSample} />
-        <Story />
+        <DeferredStory />
         <Triangulation />
         <Builder busy={run.phase === 'loading'} status={status} example={example} onSubmit={chart} onSample={showSample} />
         <Results run={run} collection={collection} onRetry={retry} onSample={showSample} />
@@ -68,7 +107,7 @@ export default function App() {
         <FinalCTA onExample={loadExample} />
       </main>
       <Footer />
-      <CollectionDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} collection={collection} />
+      <CollectionDrawer open={drawerOpen} onClose={closeCollection} collection={collection} />
     </>
   );
 }

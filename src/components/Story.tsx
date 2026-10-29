@@ -136,7 +136,7 @@ export default function Story() {
   }, []);
 
   return (
-    <section className="story" id="how" ref={root}>
+    <section className="story" ref={root}>
       <div className="story__stage">
         <div className="story__copy">
           <Eyebrow index="01">How it works</Eyebrow>

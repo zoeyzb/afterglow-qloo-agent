@@ -50,7 +50,7 @@ export interface Atlas {
   lenses: Lens[];
 }
 
-export type AtlasErrorCode = 'not_configured' | 'unresolved' | 'invalid' | 'upstream' | 'network';
+export type AtlasErrorCode = 'not_configured' | 'unresolved' | 'invalid' | 'upstream' | 'network' | 'rate_limit' | 'timeout';
 
 export interface AtlasRequest {
   signals: { domain: DomainId; name: string }[];

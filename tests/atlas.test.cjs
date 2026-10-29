@@ -135,3 +135,35 @@ test('explainability parser handles keyed and nested shapes', () => {
   assert.deepEqual(_internal.explainDrivers({ query: { explainability: { a: 3, b: 1, c: 9 } } }, seeds).map(d => d.id), ['a', 'b']);
   assert.deepEqual(_internal.explainDrivers({}, seeds), []);
 });
+
+test('preserves Qloo rate limits as a distinct retryable error', withKey('unit', async () => {
+  global.fetch = async () => ({ ok: false, status: 429, text: async () => '{}' });
+  const r = await call(input);
+  assert.equal(r.statusCode, 429);
+  assert.equal(r.body.code, 'rate_limit');
+  assert.match(r.body.error, /rate limit/i);
+}));
+
+test('preserves Qloo timeouts as a retryable timeout error', withKey('unit', async () => {
+  global.fetch = async () => { throw Object.assign(new Error('aborted'), { name: 'AbortError' }); };
+  const r = await call(input);
+  assert.equal(r.statusCode, 504);
+  assert.equal(r.body.code, 'timeout');
+  assert.match(r.body.error, /timed out/i);
+}));
+
+test('preserves timeout status when every discovery domain times out', withKey('unit', async () => {
+  global.fetch = async url => {
+    const u = new URL(url);
+    if (u.pathname === '/search') {
+      const name = u.searchParams.get('query');
+      return ok({ results: { entities: [{ entity_id: ids[name], name }] } });
+    }
+    if (u.searchParams.get('filter.type') === 'urn:tag') return ok({ results: { tags: [] } });
+    throw Object.assign(new Error('aborted'), { name: 'AbortError' });
+  };
+  const r = await call({ ...input, lenses: ['destination', 'book'] });
+  assert.equal(r.statusCode, 504);
+  assert.equal(r.body.code, 'timeout');
+  assert.match(r.body.error, /timed out/i);
+}));

@@ -7,13 +7,17 @@ export class AtlasError extends Error {
 export type LiveStatus = 'checking' | 'configured' | 'offline' | 'unknown';
 
 export async function fetchStatus(): Promise<LiveStatus> {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 4000);
   try {
-    const res = await fetch('/api/status', { cache: 'no-store' });
+    const res = await fetch('/api/status', { cache: 'no-store', signal: controller.signal });
     if (!res.ok) return 'unknown';
     const data = await res.json();
     return data?.configured ? 'configured' : 'offline';
   } catch {
     return 'unknown';
+  } finally {
+    window.clearTimeout(timeout);
   }
 }
 
